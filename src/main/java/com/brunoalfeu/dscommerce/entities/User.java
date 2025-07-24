@@ -6,6 +6,7 @@ import org.springframework.cglib.core.Local;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "tb_user")
@@ -19,7 +20,7 @@ public class User {
     @Column(unique = true)
     private String email;
     private String phone;
-    private LocalDate birthday;
+    private LocalDate birthDate;
     private String password;
 
     @OneToMany(mappedBy = "client")
@@ -28,12 +29,12 @@ public class User {
     public User(){
     }
 
-    public User(Long id, String email, String name, String phone, LocalDate birthday, String password) {
+    public User(Long id, String email, String name, String phone, LocalDate birthDate, String password) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.phone = phone;
-        this.birthday = birthday;
+        this.birthDate = birthDate;
         this.password = password;
     }
 
@@ -69,12 +70,12 @@ public class User {
         this.phone = phone;
     }
 
-    public LocalDate getBirthday() {
-        return birthday;
+    public LocalDate getBirthDate() {
+        return birthDate;
     }
 
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
     public String getPassword() {
@@ -87,5 +88,18 @@ public class User {
 
     public List<Order> getOrders() {
         return orders;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
