@@ -1,16 +1,23 @@
 package com.brunoalfeu.dscommerce.dto;
 
 import com.brunoalfeu.dscommerce.entities.Product;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 public class ProductDTO {
 
     private Long id;
+
+    @NotBlank(message = "Campo requerido")
+    @Size(min = 3, max = 80, message = "O nome precisa ter entre 3 a 80 caracteres")
     private String name;
+
+    @NotBlank(message = "Campo requerido")
+    @Size(min = 10, message = "Descrição deve ter no minimo 10 caracteres")
     private String description;
+
+    @Positive(message = "O preço deve ser positivo")
     private Double price;
     private String imgUrl;
 
