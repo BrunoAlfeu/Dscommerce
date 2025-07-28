@@ -1,11 +1,7 @@
 package com.brunoalfeu.dscommerce.services;
 
-import com.brunoalfeu.dscommerce.dto.ProductDTO;
-import com.brunoalfeu.dscommerce.entities.Product;
-import com.brunoalfeu.dscommerce.repositories.ProductRepository;
-import com.brunoalfeu.dscommerce.services.exceptions.DatabaseException;
-import com.brunoalfeu.dscommerce.services.exceptions.ResourceNotFoundException;
-import jakarta.persistence.EntityNotFoundException;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -14,7 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import com.brunoalfeu.dscommerce.dto.ProductDTO;
+import com.brunoalfeu.dscommerce.dto.ProductMinDTO;
+import com.brunoalfeu.dscommerce.entities.Product;
+import com.brunoalfeu.dscommerce.repositories.ProductRepository;
+import com.brunoalfeu.dscommerce.services.exceptions.DatabaseException;
+import com.brunoalfeu.dscommerce.services.exceptions.ResourceNotFoundException;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ProductService {
@@ -32,9 +35,9 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductDTO> findAll(String name, Pageable pageable) {
+    public Page<ProductMinDTO> findAll(String name, Pageable pageable) {
         Page<Product> result = repository.searchByName(name, pageable);
-        return result.map(x -> new ProductDTO(x));
+        return result.map(x -> new ProductMinDTO(x));
     }
 
     @Transactional
