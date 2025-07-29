@@ -10,9 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.brunoalfeu.dscommerce.dto.CategoryDTO;
 import com.brunoalfeu.dscommerce.dto.ProductDTO;
 import com.brunoalfeu.dscommerce.dto.ProductMinDTO;
+import com.brunoalfeu.dscommerce.entities.Category;
 import com.brunoalfeu.dscommerce.entities.Product;
+import com.brunoalfeu.dscommerce.repositories.CategoryRepository;
 import com.brunoalfeu.dscommerce.repositories.ProductRepository;
 import com.brunoalfeu.dscommerce.services.exceptions.DatabaseException;
 import com.brunoalfeu.dscommerce.services.exceptions.ResourceNotFoundException;
@@ -24,6 +27,9 @@ public class ProductService {
 
     @Autowired
     private ProductRepository repository;
+    
+    @Autowired
+    private CategoryRepository catRepository;
 
     @Transactional(readOnly = true)
     public ProductDTO findById(Long id) {
@@ -82,6 +88,13 @@ public class ProductService {
         entity.setDescription(dto.getDescription());
         entity.setPrice(dto.getPrice());
         entity.setImgUrl(dto.getImgUrl());
+        
+        entity.getCategories().clear();
+        for (CategoryDTO catDto : dto.getCategories()) {
+        	Category cat = catRepository.getReferenceById(catDto.getId());
+        	cat.setId(catDto.getId());
+        	entity.getCategories().add(cat);
+        }
     }
 
 
