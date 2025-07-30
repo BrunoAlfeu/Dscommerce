@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.jaxb.SpringDataJaxb.OrderDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,43 +24,44 @@ public class OrderService {
 
 	@Autowired
 	private OrderRepository repository;
-	
+
 	@Autowired
 	private OrderItemRepository orderItemRepository;
-	
+
 	@Autowired
 	private ProductRepository productRepository;
-	
+
 	@Autowired
 	private UserService service;
 	
-	 @Transactional(readOnly = true)
-	    public OrderDTO findById(Long id) {
-	        Optional<Order> result = repository.findById(id);
-	        Order order = result.orElseThrow(
-	                () -> new ResourceNotFoundException("Recurso não encontrado"));
-	        OrderDTO dto = new OrderDTO(order);
-	        return dto;
-	    }
+	@Autowired
+	private AuthService authService;
 
-	  @Transactional
-	    public OrderDTO insert(OrderDTO dto) {
-	        Order order = new Order();
-	        
-	        order.setMoment(Instant.now());
-	        order.setStatus(OrderStatus.WAITING_PAYMENT);
+	@Transactional(readOnly = true)
+	public OrderDTO findById(Long id) {
+		Optional<Order> result = repository.findById(id);
+		Order order = result.orElseThrow(() -> new ResourceNotFoundException("Recurso não encontrado"));
+		authService.validateSelfOrAdmin(order.getClient().getId());
+		return new OrderDTO(order);
+	}
 
-	        User user = service.authenticated();
-	        order.setClient(user);
+	@Transactional
+	public OrderDTO insert(OrderDTO dto) {
+		Order order = new Order();
 
-	        for(OrderItemDTO itemDto : dto.getItems()){
-	            Product product = productRepository.getReferenceById(itemDto.getProductId());
-	            OrderItem item = new OrderItem(order, product, itemDto.getQuantity(), product.getPrice());
-	            order.getItems().add(item);
-	        }
-	        repository.save(order);
-	        orderItemRepository.saveAll(order.getItems());
+		order.setMoment(Instant.now());
+		order.setStatus(OrderStatus.WAITING_PAYMENT);
 
-	        return new OrderDTO(order);
-	    }
+		User user = service.authenticated();
+		order.setClient(user);
+
+		for (OrderItemDTO itemDto : dto.getItems()) {
+			Product product = productRepository.getReferenceById(itemDto.getProductId());
+			OrderItem item = new OrderItem(order, product, itemDto.getQuantity(), product.getPrice());
+			order.getItems().add(item);
+		}
+		repository.save(order);
+		orderItemRepository.saveAll(order.getItems());
+		return new OrderDTO(order);
+	}
 }
