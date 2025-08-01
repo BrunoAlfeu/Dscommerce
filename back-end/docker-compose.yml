@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Serviço do Banco de Dados PostgreSQL
+  db:
+    image: postgres:16.2-alpine
+    container_name: dscommerce_db
+    restart: always
+    ports:
+      - "5432:5432" # Expõe a porta do banco para o seu computador (host)
+    environment:
+      - POSTGRES_DB=dscommerce
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Serviço da sua Aplicação Spring Boot
+  app:
+    build: . # Constrói a imagem a partir do Dockerfile na pasta atual
+    container_name: dscommerce_app
+    depends_on:
+      - db # Garante que o serviço 'db' inicie antes do 'app'
+    ports:
+      - "8080:8080"
+    environment:
+      # Sobrescreve a URL do banco para apontar para o container 'db'
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/dscommerce
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=12345
+
+volumes:
+  # Define o volume para persistir os dados do PostgreSQL
+  postgres_data:
