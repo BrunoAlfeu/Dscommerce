@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Serviço do Banco de Dados PostgreSQL
   db:
@@ -24,6 +22,9 @@ services:
     ports:
       - "8080:8080"
     environment:
+      # --- ADICIONE ESTA LINHA ---
+      - SPRING_PROFILES_ACTIVE=prod
+      # ---------------------------
       # Sobrescreve a URL do banco para apontar para o container 'db'
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/dscommerce
       - SPRING_DATASOURCE_USERNAME=postgres
